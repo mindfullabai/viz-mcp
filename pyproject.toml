@@ -1,0 +1,28 @@
+[project]
+name = "viz-mcp"
+version = "0.1.0"
+description = "MCP server for data visualization from tracking-mcp"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.7.1",
+    "matplotlib>=3.8.0",
+    "plotly>=5.18.0",
+    "pandas>=2.1.0",
+    "numpy>=1.26.0",
+    "seaborn>=0.13.0",
+    "kaleido>=0.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mcp_server"]
