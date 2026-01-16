@@ -1,8 +1,10 @@
 # viz-mcp
 
-![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-orange.svg)
+[![PyPI version](https://img.shields.io/pypi/v/viz-mcp.svg)](https://pypi.org/project/viz-mcp/)
+[![Python Version](https://img.shields.io/pypi/pyversions/viz-mcp.svg)](https://pypi.org/project/viz-mcp/)
+[![License](https://img.shields.io/github/license/mindfullabai/viz-mcp.svg)](https://github.com/mindfullabai/viz-mcp/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/pypi/dm/viz-mcp.svg)](https://pypi.org/project/viz-mcp/)
+[![GitHub stars](https://img.shields.io/github/stars/mindfullabai/viz-mcp.svg)](https://github.com/mindfullabai/viz-mcp/stargazers)
 
 **Data visualization MCP server with auto-chart generation and multi-chart dashboards.**
 
