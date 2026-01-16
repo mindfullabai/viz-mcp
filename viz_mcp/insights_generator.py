@@ -1,7 +1,7 @@
 """Automatic insights generation from chart data."""
 
 import pandas as pd
-from auto_detect import normalize_input, ChartType, get_column_by_type
+from .auto_detect import normalize_input, ChartType, get_column_by_type
 
 
 def generate_insights(data, chart_type: ChartType) -> str:

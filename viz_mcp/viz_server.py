@@ -27,9 +27,9 @@ from mcp.server import Server
 from mcp.types import TextContent, ImageContent, EmbeddedResource, Tool, Resource
 
 # Import auto-detection, chart generation, and insights
-from auto_detect import auto_detect_chart_type, ChartType
-from chart_generator import generate_chart
-from insights_generator import generate_insights
+from .auto_detect import auto_detect_chart_type, ChartType
+from .chart_generator import generate_chart
+from .insights_generator import generate_insights
 
 # ============================================================================
 # CONFIGURATION
@@ -1121,7 +1121,7 @@ async def read_resource(uri: str) -> str:
 # MAIN
 # ============================================================================
 
-async def main():
+async def async_main():
     """Run MCP server."""
     from mcp.server.stdio import stdio_server
 
@@ -1133,6 +1133,11 @@ async def main():
         )
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the MCP server."""
     import anyio
-    anyio.run(main)
+    anyio.run(async_main)
+
+
+if __name__ == "__main__":
+    main()

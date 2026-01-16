@@ -3,7 +3,7 @@
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-from auto_detect import ChartType, normalize_input, infer_type, get_column_by_type
+from .auto_detect import ChartType, normalize_input, infer_type, get_column_by_type
 
 
 def generate_chart(data, chart_type: ChartType, title: str = "") -> go.Figure:
