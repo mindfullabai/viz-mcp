@@ -1,6 +1,6 @@
 [project]
 name = "viz-mcp"
-version = "0.1.0"
+version = "1.0.0"
 description = "MCP server for data visualization from tracking-mcp"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,8 +21,11 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools>=68.0"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["mcp_server"]
+packages = ["viz_mcp"]
+
+[project.scripts]
+viz-mcp = "viz_mcp.viz_server:main"

@@ -1,275 +1,438 @@
 # viz-mcp
 
-**Data Visualization MCP Server for tracking-mcp**
+![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-orange.svg)
 
-Generate interactive charts, heatmaps, and dashboards from tracking data.
+**Data visualization MCP server with auto-chart generation and multi-chart dashboards.**
+
+Automatically generate interactive charts, heatmaps, and comprehensive dashboards from any data structure. Auto-detects optimal chart type, generates insights, and outputs self-contained HTML or PNG files.
 
 ## Features
 
-### Tools
-
-**1. generate_scorecard_heatmap**
-- Calendar heatmap of daily scorecard scores
-- Output: PNG image (matplotlib + seaborn)
-- Highlights patterns: weekdays vs weekends, high/low score days
-
-**2. generate_fitness_trend**
-- Interactive chart: workout strain + recovery %
-- Output: HTML (plotly interactive)
-- Dual-axis: strain (bars) + recovery (line)
-
-**3. generate_weight_progress**
-- Weight loss progress vs target line
-- Output: HTML (plotly interactive)
-- Shows: actual weight, target trajectory (-0.5kg/week)
-
-**4. generate_correlation_plot**
-- Scatter plot + trend line for any two metrics
-- Output: PNG (matplotlib)
-- Examples: recovery vs strain, sleep vs score, HRV vs performance
-
-### Resources
-
-**viz://dashboard/weekly**
-- Weekly summary dashboard (markdown)
-- Auto-calculates current week
-- Summary: scorecard avg, total workouts, weight measurements
-
-**viz://stats/summary**
-- Visualization stats (JSON)
-- Total events by entity_type
-- Export directory, database path
+- **Auto-Detection**: Automatically selects optimal chart type from data structure
+- **Multiple Chart Types**: Line, bar, pie, table, metric displays
+- **Interactive Visualizations**: Self-contained HTML with Plotly (no internet required)
+- **Static Charts**: High-quality PNG exports with Matplotlib
+- **Multi-Chart Dashboards**: Combine multiple charts in single HTML file
+- **AI-Generated Insights**: Automatic data analysis and observations
+- **Chart Management**: List and delete generated charts
+- **Flexible Input**: Accepts dict, list, nested structures
+- **Zero Configuration**: Works out of the box with sensible defaults
 
 ## Installation
 
+### From PyPI (when published)
+
 ```bash
-cd ~/Desktop/Projects/04-Personal-Tools/viz-mcp
-python3 -m venv .venv
-.venv/bin/pip install -e .
+pip install viz-mcp
 ```
 
-## Configuration
+### From Source
 
-Add to `work-hub/.mcp.json`:
+```bash
+git clone https://github.com/mariomosca/viz-mcp.git
+cd viz-mcp
+pip install -e .
+```
+
+## Quick Start
+
+### Claude Desktop Configuration
+
+Add to your Claude Desktop MCP settings (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
-  "viz-mcp": {
-    "type": "stdio",
-    "command": "/path/to/viz-mcp/.venv/bin/python3",
-    "args": ["/path/to/viz-mcp/mcp_server/viz_server.py"],
-    "env": {
-      "TRACKING_DB_PATH": "/path/to/tracking-mcp/data/tracking.db",
-      "EXPORT_DIR": "/path/to/viz-mcp/exports"
+  "mcpServers": {
+    "viz": {
+      "command": "viz-mcp",
+      "env": {
+        "EXPORT_DIR": "/path/to/export/directory"
+      }
     }
   }
 }
 ```
 
-Add permissions to `.claude/settings.local.json`:
+### Basic Usage
 
-```json
-{
-  "permissions": {
-    "allow": [
-      "mcp__viz-mcp__*"
-    ]
-  }
-}
+From Claude Desktop:
+
+```
+Visualize this data: {"Jan": 100, "Feb": 150, "Mar": 200}
 ```
 
-## Usage Examples
-
-### Generate Scorecard Heatmap
-
-```python
-mcp__viz-mcp__generate_scorecard_heatmap(
-  start_date="2026-01-01",
-  end_date="2026-01-14"
-)
-# Output: exports/scorecard_heatmap_YYYYMMDD_HHMMSS.png
+```
+Create a dashboard with my sales and revenue data
 ```
 
-### Generate Fitness Trend
-
-```python
-mcp__viz-mcp__generate_fitness_trend(
-  start_date="2026-01-01",
-  end_date="2026-01-14"
-)
-# Output: exports/fitness_trend_YYYYMMDD_HHMMSS.html
-# Open in browser for interactive chart
+```
+Show me a list of all generated charts
 ```
 
-### Generate Weight Progress
+## MCP Server Specification
 
+### Tools (4)
+
+#### 1. `visualize`
+Generic visualization tool with auto-detection.
+
+**Parameters**:
+- `data` (object|array, required): Data to visualize (dict, list of dicts, or nested structure)
+- `chart_type` (string, optional): Chart type - 'auto' (default), 'line', 'bar', 'pie', 'table', 'metric'
+- `title` (string, optional): Chart title (auto-generated if omitted)
+- `description` (string, optional): Chart description
+- `insights` (string, optional): Data insights (auto-generated if omitted)
+
+**Returns**: Interactive HTML chart with auto-generated insights
+
+**Examples**:
 ```python
-mcp__viz-mcp__generate_weight_progress(
-  start_date="2026-01-04",
-  end_date="2026-01-14"
-)
-# Output: exports/weight_progress_YYYYMMDD_HHMMSS.html
-```
-
-### Generate Correlation Plot
-
-```python
-# Recovery vs Strain
-mcp__viz-mcp__generate_correlation_plot(
-  entity_type="workout",
-  x_field="recovery_pre",
-  y_field="strain",
-  start_date="2026-01-01",
-  end_date="2026-01-14"
+# Auto-detect chart type
+visualize(
+    data={"Q1": 10000, "Q2": 15000, "Q3": 12000, "Q4": 18000}
 )
 
-# Sleep vs Score (nested field access)
-mcp__viz-mcp__generate_correlation_plot(
-  entity_type="scorecard",
-  x_field="whoop.hrv",
-  y_field="score",
-  start_date="2026-01-01",
-  end_date="2026-01-14"
+# Force specific chart type
+visualize(
+    data=[{"month": "Jan", "sales": 100}, {"month": "Feb", "sales": 150}],
+    chart_type="line",
+    title="Monthly Sales Trend"
 )
-# Output: exports/correlation_ENTITY_YYYYMMDD_HHMMSS.png
+
+# Metric display
+visualize(
+    data={"total_revenue": 50000, "growth": "+15%"},
+    chart_type="metric"
+)
 ```
 
-### Read Weekly Dashboard
+#### 2. `visualize_multi`
+Create multi-chart dashboard in single HTML.
+
+**Parameters**:
+- `charts` (array, required): Array of chart configurations (max 6 charts)
+  - Each chart has: `data`, `chart_type` (optional), `title` (optional), `description` (optional), `insights` (optional)
+- `dashboard_title` (string, optional): Dashboard title (default: "Multi-Chart Dashboard")
+- `dashboard_description` (string, optional): Dashboard description
+
+**Returns**: Self-contained HTML dashboard with multiple charts
+
+**Example**:
+```python
+visualize_multi(
+    charts=[
+        {
+            "data": {"Q1": 10000, "Q2": 15000, "Q3": 12000, "Q4": 18000},
+            "title": "Quarterly Revenue"
+        },
+        {
+            "data": [{"month": "Jan", "users": 500}, {"month": "Feb", "users": 650}],
+            "chart_type": "line",
+            "title": "User Growth"
+        },
+        {
+            "data": {"Active": 1200, "Inactive": 300},
+            "chart_type": "pie",
+            "title": "User Status"
+        }
+    ],
+    dashboard_title="Q4 2025 Business Metrics"
+)
+```
+
+#### 3. `list_charts`
+List all generated charts with metadata.
+
+**Parameters**: None
+
+**Returns**: JSON array of charts with:
+- `chart_id`: Unique identifier
+- `chart_type`: Type of chart
+- `title`: Chart title
+- `created_at`: Creation timestamp
+- `file_size`: File size in bytes
+- `file_path`: Path to chart file
+
+#### 4. `delete_chart`
+Delete a chart by its ID.
+
+**Parameters**:
+- `chart_id` (string, required): Chart ID to delete (from list_charts)
+
+**Returns**: Success/failure message
+
+## Chart Type Auto-Detection
+
+viz-mcp automatically selects the optimal chart type based on your data structure:
+
+| Data Structure | Auto-Selected Chart | Use Case |
+|----------------|---------------------|----------|
+| `{"A": 10, "B": 20}` | Bar chart | Compare categories |
+| `[{"x": 1, "y": 10}, {"x": 2, "y": 20}]` | Line chart | Show trends over time |
+| `{"Category A": 30, "Category B": 70}` | Pie chart | Show proportions (if 2-5 items) |
+| `[{"name": "Alice", "score": 95}, ...]` | Table | Detailed data display |
+| `{"metric": 1500, "change": "+10%"}` | Metric | Single value display |
+
+You can always override auto-detection by specifying `chart_type`.
+
+## Output Formats
+
+### Interactive HTML (Default)
+- **Self-contained**: No internet connection required
+- **Interactive**: Zoom, pan, hover tooltips
+- **Responsive**: Adapts to screen size
+- **Shareable**: Send as single file
+- **Technology**: Plotly.js
+
+### Static PNG
+- **High Quality**: 150 DPI, publication-ready
+- **Technology**: Matplotlib
+- **File Size**: Typically 50-200 KB
+- **Use Case**: Reports, presentations
+
+## Advanced Usage
+
+### Dashboard with Mixed Chart Types
 
 ```python
-mcp__viz-mcp__read_resource(uri="viz://dashboard/weekly")
-# Returns: Markdown summary of current week
+visualize_multi(
+    charts=[
+        {
+            "data": {"Revenue": 50000, "Costs": 35000, "Profit": 15000},
+            "chart_type": "bar",
+            "title": "Financial Overview"
+        },
+        {
+            "data": [
+                {"date": "2026-01-01", "users": 1000},
+                {"date": "2026-01-08", "users": 1200},
+                {"date": "2026-01-15", "users": 1350}
+            ],
+            "chart_type": "line",
+            "title": "Weekly User Growth"
+        },
+        {
+            "data": {"Plan A": 450, "Plan B": 320, "Plan C": 230},
+            "chart_type": "pie",
+            "title": "Subscription Distribution"
+        }
+    ],
+    dashboard_title="Weekly Business Dashboard",
+    dashboard_description": "Key metrics for Week 2, Jan 2026"
+)
 ```
 
-## Architecture
+### Custom Insights
+
+```python
+visualize(
+    data={"Q1": 10000, "Q2": 15000, "Q3": 12000, "Q4": 18000},
+    title="Quarterly Revenue 2025",
+    description="Revenue performance by quarter",
+    insights="Q2 showed strongest growth (+50%). Q3 dip attributed to seasonal factors. Q4 recovery exceeded projections."
+)
+```
+
+### Integration with tracking-mcp
+
+```python
+# Query data from tracking-mcp
+events = query_events(
+    entity_type="weight",
+    start_date="2026-01-01",
+    end_date="2026-01-15"
+)
+
+# Transform and visualize
+weight_data = [
+    {"date": e["date"], "weight": e["data"]["weight_kg"]}
+    for e in events
+]
+
+visualize(
+    data=weight_data,
+    chart_type="line",
+    title="Weight Progress - January 2026"
+)
+```
+
+## Project Structure
 
 ```
 viz-mcp/
-├── mcp_server/
-│   ├── __init__.py
-│   └── viz_server.py          # MCP server + visualization functions
-├── exports/                    # Generated charts (PNG/HTML)
+├── viz_mcp/
+│   ├── viz_server.py          # MCP server implementation
+│   ├── auto_detect.py          # Auto-detection logic
+│   ├── chart_generator.py     # Chart generation
+│   ├── insights_generator.py  # AI insights
+│   └── __init__.py
+├── exports/                    # Generated charts (HTML/PNG)
 ├── tests/
 │   └── test_basic.py
 ├── pyproject.toml
+├── LICENSE
+├── CHANGELOG.md
 └── README.md
-
-Connects to:
-  tracking-mcp/data/tracking.db  (SQLite database)
-```
-
-## Chart Types
-
-### 1. Heatmap (matplotlib + seaborn)
-- **Use case**: Patterns over time (weekly/monthly view)
-- **Best for**: Scorecard scores, habit tracking
-- **Format**: Static PNG
-- **Size**: ~150 DPI, optimized for viewing
-
-### 2. Interactive Line/Bar (plotly)
-- **Use case**: Trends, dual-metric comparison
-- **Best for**: Fitness metrics, weight progress
-- **Format**: HTML (self-contained, no internet required)
-- **Interactive**: Zoom, pan, hover tooltips
-
-### 3. Scatter + Regression (matplotlib)
-- **Use case**: Correlation analysis
-- **Best for**: Finding relationships between metrics
-- **Format**: Static PNG
-- **Features**: Trend line, correlation coefficient
-
-## Data Access
-
-viz-mcp connects to tracking-mcp database in **read-only** mode:
-- No writes to database
-- Safe to run in parallel with tracking-mcp
-- Exports stored in viz-mcp/exports/ directory
-
-## Nested Field Access
-
-Supports dot notation for nested JSON fields:
-
-```python
-# Access nested whoop.recovery
-x_field="whoop.recovery"
-
-# Access nested diet.protein_g
-y_field="diet.protein_g"
 ```
 
 ## Dependencies
 
-- **mcp**: MCP SDK
-- **matplotlib**: Static charts (PNG)
-- **plotly**: Interactive charts (HTML)
-- **pandas**: Data manipulation
-- **seaborn**: Enhanced heatmaps
-- **kaleido**: Plotly PNG export (optional)
+- **mcp** (>=1.7.1): MCP SDK
+- **matplotlib** (>=3.8.0): Static charts
+- **plotly** (>=5.18.0): Interactive visualizations
+- **pandas** (>=2.1.0): Data manipulation
+- **numpy** (>=1.26.0): Numerical operations
+- **seaborn** (>=0.13.0): Enhanced styling
+- **kaleido** (>=0.2.1): Static image export
 
-## Roadmap
+## Architecture
 
-**Phase 2: Advanced Charts** (planned)
-- Multi-metric dashboard (single HTML with tabs)
-- Moving average + trend analysis
-- Week-over-week comparison
-- Streak visualization
+### Auto-Detection Algorithm
 
-**Phase 3: Pre-built Templates** (planned)
-- Monthly report (PDF export)
-- Q1 progress dashboard
-- Correlation matrix (all metrics)
+1. **Analyze data structure**: dict, list, nested
+2. **Count data points**: Single value vs multiple
+3. **Detect patterns**: Time series, categories, proportions
+4. **Select chart type**: Line, bar, pie, table, metric
+5. **Generate chart**: Plotly (HTML) or Matplotlib (PNG)
+6. **Add insights**: AI-generated observations
+
+### Chart Generation Pipeline
+
+```
+Input Data → Auto-Detect → Generate Chart → Add Insights → Export (HTML/PNG)
+```
+
+### Insights Generation
+
+- **Automatic Analysis**: Trends, outliers, patterns
+- **Statistical Metrics**: Mean, median, min, max, variance
+- **Observations**: Growth rates, comparisons, highlights
+- **Natural Language**: Human-readable insights
+
+## Chart Management
+
+### List All Charts
+
+```python
+list_charts()
+```
+
+**Returns**:
+```json
+[
+  {
+    "chart_id": "abc123...",
+    "chart_type": "line",
+    "title": "Monthly Revenue",
+    "created_at": "2026-01-16T10:30:00",
+    "file_size": 125000,
+    "file_path": "/path/to/exports/chart_abc123.html"
+  }
+]
+```
+
+### Delete Chart
+
+```python
+delete_chart(chart_id="abc123...")
+```
+
+## Development
+
+### Run Tests
+
+```bash
+pytest
+```
+
+### Code Quality
+
+```bash
+# Format code
+black viz_mcp/
+
+# Lint
+ruff check viz_mcp/
+```
+
+### Install Development Dependencies
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Version History
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
+**Current version**: 1.0.0 (Initial public release)
+
+## Related Projects
+
+- **[tracking-mcp](https://github.com/mariomosca/tracking-mcp)**: Companion MCP server for entity tracking (provides data source for visualizations)
+
+## Use Cases
+
+### Personal Productivity
+- Daily scorecard heatmaps
+- Habit tracking visualizations
+- Weight loss progress charts
+- Fitness metrics dashboards
+
+### Business Analytics
+- Sales trend analysis
+- Revenue vs costs comparison
+- User growth tracking
+- Subscription distribution
+
+### Data Science
+- Exploratory data analysis
+- Quick data visualization
+- Dashboard prototyping
+- Report generation
 
 ## Troubleshooting
 
 ### Charts not generating
 
-1. Check tracking-mcp database path:
-   ```bash
-   ls -la ~/Desktop/Projects/04-Personal-Tools/tracking-mcp/data/tracking.db
-   ```
+Check export directory exists and is writable:
+```bash
+ls -la ~/path/to/exports/
+```
 
-2. Verify data exists for date range:
-   ```python
-   mcp__tracking-mcp__query_events(
-     entity_type="scorecard",
-     start_date="2026-01-01"
-   )
-   ```
+### "No data to visualize" error
+
+Ensure data is not empty:
+```python
+# Bad
+data = {}
+
+# Good
+data = {"A": 10, "B": 20}
+```
 
 ### Interactive charts won't open
 
 HTML files are self-contained. Open manually:
 ```bash
-open ~/Desktop/Projects/04-Personal-Tools/viz-mcp/exports/fitness_trend_*.html
+open ~/path/to/exports/chart_*.html
 ```
 
-### Permission errors
+## License
 
-Ensure viz-mcp permissions in `.claude/settings.local.json`:
-```json
-"mcp__viz-mcp__*"
-```
+MIT License - see [LICENSE](LICENSE) file for details.
 
-Restart Claude Code session after adding permissions.
+## Author
 
-## Current Status (2026-01-14)
+**Mario Mosca** - [GitHub](https://github.com/mariomosca)
 
-**Phase 1: Core Setup** ✅
-- [x] Directory structure
-- [x] Python venv + dependencies
-- [x] MCP server skeleton
-- [x] 4 chart tools implemented
-- [x] 2 resources (dashboard, stats)
-- [x] work-hub integration
+## Contributing
 
-**Next**: Phase 2 - Advanced Charts
+Contributions welcome! Please open an issue or pull request.
 
-**Total effort**: ~4h
+## Support
 
-## Examples Output
-
-See `exports/` directory for generated charts:
-- `scorecard_heatmap_*.png` - Calendar view of scores
-- `fitness_trend_*.html` - Interactive strain/recovery
-- `weight_progress_*.html` - Weight loss trajectory
-- `correlation_*.png` - Scatter plots with trend lines
+For issues, questions, or feature requests, please open an issue on GitHub:
+https://github.com/mariomosca/viz-mcp/issues
