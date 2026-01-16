@@ -24,16 +24,20 @@ Automatically generate interactive charts, heatmaps, and comprehensive dashboard
 
 ## Installation
 
-### From PyPI (when published)
+### Using uvx (Recommended)
 
 ```bash
+# Run directly without installation
+uvx viz-mcp
+
+# Or install globally
 pip install viz-mcp
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/mariomosca/viz-mcp.git
+git clone https://github.com/mindfullabai/viz-mcp.git
 cd viz-mcp
 pip install -e .
 ```
@@ -42,15 +46,34 @@ pip install -e .
 
 ### Claude Desktop Configuration
 
-Add to your Claude Desktop MCP settings (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+Add to your Claude Desktop MCP settings (`.mcp.json` or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
   "mcpServers": {
-    "viz": {
+    "viz-mcp": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["viz-mcp"],
+      "env": {
+        "EXPORT_DIR": "/path/to/export/directory",
+        "TRACKING_DB_PATH": "/path/to/tracking.db"
+      }
+    }
+  }
+}
+```
+
+**Alternative (with pip install)**:
+```json
+{
+  "mcpServers": {
+    "viz-mcp": {
+      "type": "stdio",
       "command": "viz-mcp",
       "env": {
-        "EXPORT_DIR": "/path/to/export/directory"
+        "EXPORT_DIR": "/path/to/export/directory",
+        "TRACKING_DB_PATH": "/path/to/tracking.db"
       }
     }
   }
@@ -369,7 +392,7 @@ pip install -e ".[dev]"
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
-**Current version**: 1.0.0 (Initial public release)
+**Current version**: 1.0.1 (Async entry point + import fixes)
 
 ## Related Projects
 
@@ -396,6 +419,32 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 - Report generation
 
 ## Troubleshooting
+
+### RuntimeWarning: coroutine 'main' was never awaited
+
+If you see this error when running the server:
+```
+<coroutine object main at 0x...>
+RuntimeWarning: coroutine 'main' was never awaited
+```
+
+This was fixed in version 1.0.1. Update to the latest version:
+```bash
+pip install --upgrade viz-mcp
+# or with uvx
+uvx --refresh viz-mcp
+```
+
+**Root cause**: Python CLI entry points from setuptools expect synchronous `main()` functions. Version 1.0.1+ includes a sync wrapper that properly handles the async MCP server.
+
+### ModuleNotFoundError: No module named 'auto_detect'
+
+If you see import errors when running from PyPI:
+```
+ModuleNotFoundError: No module named 'auto_detect'
+```
+
+This was fixed in version 1.0.1 with proper relative imports. Update to the latest version.
 
 ### Charts not generating
 
